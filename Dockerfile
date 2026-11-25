@@ -1,5 +1,5 @@
-# Build the Spring Boot executable JAR with the project's Gradle wrapper.
-FROM eclipse-temurin:21-jdk-alpine AS build
+# Etapa 1: Compilar el proyecto con Gradle
+FROM --platform=linux/arm64 eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /workspace
 
@@ -15,13 +15,12 @@ RUN ./gradlew clean bootJar -x test --no-daemon \
     && test -n "$JAR_FILE" \
     && cp "$JAR_FILE" /tmp/app.jar
 
-# Run with a smaller Java 21 image.
-FROM eclipse-temurin:21-jre-alpine
+# Etapa 2: Ejecutar el JAR en ARM64 nativo
+FROM --platform=linux/arm64 eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
-RUN addgroup -S app \
-    && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
 
 COPY --from=build --chown=app:app /tmp/app.jar /app/app.jar
 
@@ -29,4 +28,4 @@ USER app
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Xmx350m", "-jar", "/app/app.jar"]
