@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -17,14 +18,15 @@ public class JwtUtil {
 
     // Clave secreta para firmar los tokens
     // En producción, esta clave debe estar en application.properties o variables de entorno
-    private static final String SECRET_KEY = "logitrack-secret-key-2026-para-firmar-tokens-jwt";
 
+    @Value("${jwt.secret}")
+    private String secretKey;
     // Tiempo de expiración: 10 horas (en milisegundos)
     private static final long EXPIRATION_TIME = 10 * 60 * 60 * 1000;
 
     // Método para generar la clave de firma
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     // GENERAR TOKEN

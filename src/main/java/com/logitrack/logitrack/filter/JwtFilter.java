@@ -26,9 +26,10 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/auth/");
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Deja pasar preflight y rutas públicas
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || request.getRequestURI().startsWith("/auth/");
     }
 
     @Override
@@ -46,7 +47,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 String username = jwtUtil.extractUsername(token);
                 String role = jwtUtil.extractRole(token);
 
-                // ESTO ES LO QUE FALTA: Agregar el rol al contexto
                 List<SimpleGrantedAuthority> authorities = List.of(
                         new SimpleGrantedAuthority("ROLE_" + role)
                 );
@@ -55,14 +55,11 @@ public class JwtFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(username, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                filterChain.doFilter(request, response);
-                return;
             }
         }
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Acceso no autorizado. Token inválido o ausente.\"}");
+        // 👇 SIEMPRE continúa la cadena. Si no hay token, Security decidirá
+        //    (401 si la ruta es protegida, 200 si es pública).
+        filterChain.doFilter(request, response);
     }
 }

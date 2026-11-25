@@ -3,6 +3,7 @@ package com.logitrack.logitrack.service;
 import com.logitrack.logitrack.model.Envio;
 import com.logitrack.logitrack.repository.EnvioRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,7 @@ public class EnvioServiceJpaImpl implements EnvioService{
     }*/
 
     //Implementacion con logica de negocio
+    @Transactional
     @Override
     public Envio save(Envio envio) {
 
