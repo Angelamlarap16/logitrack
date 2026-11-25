@@ -56,7 +56,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
-                "https://logitrack-frontend.alonsovillada63.workers.dev"          // 👈 dominio de Cloudflare Pages
+                "https://logitrack-frontend.otrodeluisvillada.workers.dev"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
